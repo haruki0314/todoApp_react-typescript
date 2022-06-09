@@ -1,2 +1,53 @@
 https://logical-studio.com/develop/development/docker/20211217-docker-react-formatter/#docker-composeyml
 ↑docker react ts 開発かんきょ
+
+ymlとdockerfile作成
+
+docker-compose build //を該当ファイルで起動
+
+docker-compose up -d //dockerコンテナを起動
+
+docker-compose ps　//dockerが立ち上がっているか確認
+
+docker exec -it node sh　//コンテナに入る
+
+
+・・・・・・・・・Dockerコンテナへの入り方・・・・・・・
+	まずはrunを使う場合。runを使うと新しくコンテナが立ち上がるから注意。
+code: コンテナ内への入り方 runを使う場合
+ $ docker run -it centos(イメージ名) /bin/bash  ← もしくはshとか
+`docker run`はイメージを元にコンテナを作るところから始めるから引数はイメージ名になる。[docker run を分解する] で`docker run`の動きを理解していれば分かりやすい。
+
+	すでに起動されているコンテナに入る場合。
+code: コンテナ内への入り方 execを使う場合
+ $ docker exec -it 79c6(コンテナID) /bin/bash  ← もしくはshとか
+すでにコンテナが存在していて起動している場合は `docker exec`を使う。引数はコンテナが存在しているので`コンテナID`となる。
+
+ちなみに....
+code:こんな感じでコンテナ内に入ってボリュームもマウントできる
+	$ docker run -it -v $(PWD)/hoge.txt(絶対パス):/hoge.txt(絶対パス) centos_test /bin/bash
+	$ docker exec -it -v $(PWD)/hoge.txt(絶対パス):/hoge.txt(絶対パス) 79c6(コンテナID) /bin/bash 
+
+
+
+[**** # docker-composeを使った場合]
+code: こんな感じになる
+	docker-compose exec web(サービス名) /bin/bash
+    ・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+
+	docker参考サイト：https://shimi-dai.com/react-typescript-with-docker/
+	https://logical-studio.com/develop/development/docker/20211217-docker-react-formatter/#docker-composeyml
+	mui 参考サイト https://www.wakuwakubank.com/posts/763-react-material-ui/
+	react-router参考サイト　
+	re
+
+
+
+
+	-------
+
+
+
+
+	-------
