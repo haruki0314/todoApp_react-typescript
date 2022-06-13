@@ -1,14 +1,15 @@
-import React from "react";
-import logo from "./logo.svg";
-import { Box, Button } from "@material-ui/core";
 import "./App.css";
+import { BrowserRouter } from "react-router-dom";
+import { Router } from "./router/Router";
+const React = require("react");
+const ReactDOM = require("react-dom");
 
 function App() {
   return (
-    <div className="App">
-      <Button variant="contained" color="primary">
-        Todoアプリケーションへ移動
-      </Button>
+    <div>
+      <BrowserRouter>
+        <Router />
+      </BrowserRouter>
     </div>
   );
 }
