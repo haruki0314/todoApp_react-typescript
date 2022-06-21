@@ -1,0 +1,12 @@
+.wrapper {
+  max-width: 1000px;
+}
+.l-main {
+  width: 500px;
+  margin: auto;
+}
+.l-main__textbox {
+  width: 0;
+  height: 0;
+  margin: 0;
+}
