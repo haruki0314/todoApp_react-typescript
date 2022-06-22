@@ -31,6 +31,7 @@ import { useState } from "react";
 //https://zenn.dev/sprout2000/articles/60cc8f1aa08b4b#react-コンポーネントの作成
 type TodoVal = {
   value: string;
+  readonly id: number;
 };
 
 const Todo = () => {
@@ -38,10 +39,44 @@ const Todo = () => {
   const [todos, setTodos] = useState<TodoVal[]>([]);
   // const [todos, setTodos] = useState<Val[]>([]);
 
+  // todos ステートを更新する関数
+  const handleOnSubmit = () => {
+    // 何も入力されていなかったらリターン
+    if (!text) return;
+
+    // 新しい Todo を作成
+    const newTodo: TodoVal = {
+      value: text,
+      id: new Date().getTime(),
+    };
+
+    /**
+     * スプレッド構文を用いて todos ステートのコピーへ newTodo を追加する
+     * 以下と同義
+     *
+     * const oldTodos = todos.slice();
+     * oldTodos.unshift(newTodo);
+     * setTodos(oldTodos);
+     *
+     **/
+    setTodos([newTodo, ...todos]);
+    // フォームへの入力をクリアする
+    setText("");
+  };
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setText(e.target.value);
+  };
+
   return (
     <div className="wrapper">
-      <form onSubmit={(e) => e.preventDefault()}>
-        <h2>PostDetail</h2>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleOnSubmit();
+        }}
+      >
+        <h2>TodoApp</h2>
         <main className="l-main">
           <div className="">
             <div className="l-main__textbox">
@@ -60,17 +95,18 @@ const Todo = () => {
               <input
                 type="text"
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => handleOnChange(e)}
               />
-              <input
-                type="submit"
-                value="追加"
-                onSubmit={(e) => e.preventDefault()}
-              />
+              <input type="submit" value="追加" onSubmit={handleOnSubmit} />
             </div>
           </div>
         </main>
       </form>
+      <ul>
+        {todos.map((todo) => {
+          return <li key={todo.id}>{todo.value}</li>;
+        })}
+      </ul>
     </div>
   );
 };
