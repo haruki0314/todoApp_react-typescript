@@ -32,22 +32,29 @@ import { useState } from "react";
 type TodoVal = {
   value: string;
   readonly id: number;
+  checked: boolean;
+  removed: boolean;
 };
+
+type Filter = "all" | "checked" | "unchecked" | "removed";
 
 const Todo = () => {
   const [text, setText] = useState("");
   const [todos, setTodos] = useState<TodoVal[]>([]);
-  // const [todos, setTodos] = useState<Val[]>([]);
+  //filter機能
+  const [filter, setFilter] = useState<Filter>("all");
 
   // todos ステートを更新する関数
   const handleOnSubmit = () => {
     // 何も入力されていなかったらリターン
     if (!text) return;
 
-    // 新しい Todo を作成
     const newTodo: TodoVal = {
       value: text,
       id: new Date().getTime(),
+      //初期値false
+      checked: false,
+      removed: false,
     };
 
     /**
@@ -64,12 +71,86 @@ const Todo = () => {
     setText("");
   };
 
+  const handleOnEdit = (id: number, value: string) => {
+    /**
+     * 引数として渡された todo の id が一致する
+     * todos ステート（のコピー）内の todo の
+     * value プロパティを引数 value (= e.target.value) に書き換える
+     */
+    const deepCopy = todos.map((todo) => ({ ...todo }));
+
+    // ディープコピーされた配列に Array.map() を適用
+    const newTodos = deepCopy.map((todo) => {
+      if (todo.id === id) {
+        todo.value = value;
+      }
+      return todo;
+    });
+
+    // todos ステート配列をチェック
+    console.log("=== Original todos ===");
+    todos.map((todo) => console.log(`id: ${todo.id}, value: ${todo.value}`));
+
+    // todos ステートを更新
+    setTodos(newTodos);
+  };
+
+  const handleOnCheck = (id: number, checked: boolean) => {
+    const deepCopy = todos.map((todo) => ({ ...todo }));
+
+    const newTodos = deepCopy.map((todo) => {
+      if (todo.id === id) {
+        todo.checked = !checked;
+      }
+      return todo;
+    });
+
+    setTodos(newTodos);
+  };
+
+  const handleOnRemove = (id: number, removed: boolean) => {
+    const deepCopy = todos.map((todo) => ({ ...todo }));
+
+    const newTodos = deepCopy.map((todo) => {
+      if (todo.id === id) {
+        todo.removed = !removed;
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+  };
+
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
   };
+  const filteredTodos = todos.filter((todo) => {
+    // filter ステートの値に応じて異なる内容の配列を返す
+    switch (filter) {
+      case "all":
+        // 削除されていないもの全て
+        return !todo.removed;
+      case "checked":
+        // 完了済 **かつ** 削除されていないもの
+        return todo.checked && !todo.removed;
+      case "unchecked":
+        // 未完了 **かつ** 削除されていないもの
+        return !todo.checked && !todo.removed;
+      case "removed":
+        // 削除済みのもの
+        return todo.removed;
+      default:
+        return todo;
+    }
+  });
 
   return (
     <div className="wrapper">
+      <select defaultValue="all" onChange={(e) => e.preventDefault()}>
+        <option value="all">すべてのタスク</option>
+        <option value="checked">完了したタスク</option>
+        <option value="unchecked">現在のタスク</option>
+        <option value="removed">ごみ箱</option>
+      </select>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -103,8 +184,25 @@ const Todo = () => {
         </main>
       </form>
       <ul>
-        {todos.map((todo) => {
-          return <li key={todo.id}>{todo.value}</li>;
+        {filteredTodos.map((todo) => {
+          return (
+            <li key={todo.id}>
+              <input
+                type="checkbox"
+                checked={todo.checked}
+                onChange={() => handleOnCheck(todo.id, todo.checked)}
+              />
+              <input
+                type="text"
+                disabled={todo.checked || todo.removed}
+                value={todo.value}
+                onChange={(e) => handleOnEdit(todo.id, e.target.value)}
+              />
+              <button onClick={() => handleOnRemove(todo.id, todo.removed)}>
+                {todo.removed ? "復元" : "消去"}
+              </button>
+            </li>
+          );
         })}
       </ul>
     </div>
